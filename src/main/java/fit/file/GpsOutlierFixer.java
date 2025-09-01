@@ -1,19 +1,31 @@
-package org.example;
+package fit.file;
 
-import com.garmin.fit.*;
+import com.garmin.fit.Decode;
+import com.garmin.fit.FileEncoder;
+import com.garmin.fit.Fit;
+import com.garmin.fit.Mesg;
+import com.garmin.fit.MesgNum;
+import com.garmin.fit.RecordMesg;
+import com.garmin.fit.SessionMesg;
 import com.google.common.io.Files;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class FitBoundsExtractor {
+public class GpsOutlierFixer {
 
     private static final String POSITION_LAT_FIELD = "position_lat";
     private static final String POSITION_LONG_FIELD = "position_long";
@@ -78,8 +90,8 @@ public class FitBoundsExtractor {
             double speed = distanceDiff / timeDiff;
             if (speed > SPEED_LIMIT) {
                 suspicious.add(mesg);
-                badRun ++;
-                if (badRun>10) {
+                badRun++;
+                if (badRun > 10) {
                     throw new RuntimeException("It looks like speed is not recovering...");
                 }
             } else {
@@ -173,7 +185,7 @@ public class FitBoundsExtractor {
         // deocode session and record mesgs
         allMessages = allMessages
                 .stream()
-                .map(FitBoundsExtractor::translate)
+                .map(GpsOutlierFixer::translate)
                 .toList();
         return allMessages;
     }
